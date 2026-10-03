@@ -148,10 +148,11 @@ public class Mainframe extends JFrame {
             int box1_end_y = box1_xy.y + 100;
 
             for (int j = 0; j < array_Box_meteorite.size(); j++) {
-                if (i == j) {
+
+                Box_meteorite box2 = array_Box_meteorite.get(j);
+                if (i == j || box1.isBoom() || box2.isBoom()) {
                     continue;
                 }
-                Box_meteorite box2 = array_Box_meteorite.get(j);
                 Point box2_xy = box2.getLocationsPoint();
                 int box2_start_x = box2_xy.x + 25;
                 int box2_end_x = box2_xy.x  + 100;
@@ -160,9 +161,7 @@ public class Mainframe extends JFrame {
 
                 
                 if (box1_start_x < box2_end_x && box1_end_x > box2_start_x  && box1_start_y < box2_end_y && box1_end_y > box2_start_y) {
-                    box2.kill();
-                    box2.removeThis();
-
+                    box2.Boom(cf.getBoom());
                 }
             }
         }

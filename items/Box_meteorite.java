@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
 import utail.BackgroundPanel;
@@ -13,6 +14,8 @@ public class Box_meteorite extends Thread {
     private BackgroundPanel box;
     private BackgroundPanel maiPanel;
     private boolean running = true;
+    private boolean isRun = true;
+    private boolean isBoom = false;
 
     private String direction = "diagonal_right";
 
@@ -20,11 +23,13 @@ public class Box_meteorite extends Thread {
     private int mainWidth = 100;
     private int mainHeight = 100;
     private int speed = 20;
+    private ImageIcon imgBoom ;
 
 
 
-    public Box_meteorite(BackgroundPanel maiPanel ,BufferedImage img){
-       box = new BackgroundPanel(img);
+
+    public Box_meteorite(BackgroundPanel maiPanel ,BufferedImage img ){
+       box = new BackgroundPanel(img , mainWidth , mainHeight);
        box.setOpaque(false);
        box.setSize(new Dimension(mainWidth , mainHeight));
        this.maiPanel = maiPanel;
@@ -87,7 +92,7 @@ public class Box_meteorite extends Thread {
             case "diagonal_right_back":
                 direction = "diagonal_left_back"; 
                 break;
-            case "right": // Fixed from empty case ""
+            case "right": 
                 direction = randomlocation("left", "diagonal_right_back", "diagonal_left_back");
                 break;
         }
@@ -153,21 +158,28 @@ public class Box_meteorite extends Thread {
 
     public void kill(){
         this.running = false;
+        this.maiPanel.remove(box);
+        this.maiPanel.repaint();
+        this.maiPanel.revalidate();
+    }
+    public void Boom(ImageIcon image){
+        this.isRun = false;
+        this.isBoom = true;
+        this.imgBoom = image;
     }
 
     public boolean isruning(){
         return this.running;
     }
 
+    public boolean isBoom(){
+        return this.isBoom;
+    }
+
     public void setSpeed(int speed){
         this.speed = speed;
     }
 
-    public void removeThis(){
-        this.maiPanel.remove(box);
-        this.maiPanel.repaint();
-        this.maiPanel.revalidate();
-    }
 
     @Override
     public void run() {
@@ -183,13 +195,29 @@ public class Box_meteorite extends Thread {
                 }
                 continue;
             }
+            if (isRun) {
 
 
 
-            SwingUtilities.invokeLater(() -> {
-                updateLocation(width , height);
-                maiPanel.repaint();
-            });
+
+                SwingUtilities.invokeLater(() -> {
+                    updateLocation(width , height);
+                    maiPanel.repaint();
+                });
+
+            }else{
+                if (isBoom) {
+                    box.setImage(imgBoom);
+
+                    try {
+                        Thread.sleep(2000);
+                        kill();
+                    } catch (InterruptedException e) {
+                        break; 
+                    }
+                    
+                }
+            }
 
             try {
                 Thread.sleep(speed);
